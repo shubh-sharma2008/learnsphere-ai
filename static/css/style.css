@@ -587,6 +587,6 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 .report-practice { border-left-color: var(--amber); }.report-practice h2 { color: var(--amber); }
 .report-strong { border-left-color: var(--good); }.report-strong h2 { color: var(--good); }
 .page-intro { padding: 45px 0 20px; max-width: 760px; }.page-intro h1 { margin: 8px 0; }.page-intro p { color: var(--text-muted); line-height: 1.65; }
-.upload-form { max-width: 680px; display: grid; gap: 18px; padding: 28px; }.upload-form label { display: grid; gap: 8px; font-weight: 600; }.upload-form input { padding: 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg-panel); color: var(--text); }
+.upload-form { max-width: 680px; display: grid; gap: 18px; padding: 28px; }.upload-form label { display: grid; gap: 8px; font-weight: 600; }.upload-form input, .upload-form textarea { padding: 12px; border-radius: 9px; border: 1px solid var(--line); background: var(--bg-panel); color: var(--text); font-family: inherit; }.upload-form textarea { resize: vertical; }
 .buddy-list { display: grid; gap: 16px; }.buddy-card { display: flex; justify-content: space-between; gap: 22px; align-items: center; }.buddy-card h2 { margin: 8px 0; font-size: 1.2rem; }.buddy-card p { color: var(--text-muted); margin: 0; }
 @media (max-width:760px) { .buddy-card { align-items: flex-start; flex-direction: column; } }

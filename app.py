@@ -791,32 +791,45 @@ def study_buddies():
 def generate_quiz():
     if request.method == "POST":
         note = request.files.get("note")
+        topic_text = request.form.get("topic_text", "").strip()
         title = request.form.get("title", "My uploaded notes").strip()[:80] or "My uploaded notes"
-        if not note or not note.filename:
-            flash("Choose a PDF or image of your notes first.", "error")
+        has_file = bool(note and note.filename)
+
+        if not has_file and not topic_text:
+            flash("Upload a PDF/image of your notes, or type a topic/text below.", "error")
             return redirect(url_for("generate_quiz"))
-        extension = note.filename.rsplit(".", 1)[-1].lower() if "." in note.filename else ""
-        if extension not in ALLOWED_NOTE_EXTENSIONS:
-            flash("Please upload a PDF, PNG, JPG, JPEG, or WEBP note.", "error")
-            return redirect(url_for("generate_quiz"))
-        stored_name = f"{session['user_id']}_{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}_{secure_filename(note.filename)}"
-        file_path = os.path.join(app.config["UPLOAD_FOLDER"], stored_name)
-        note.save(file_path)
-        extracted_text = _extract_note_text(file_path, extension)
-        if extension != "pdf" and not os.environ.get("OPENAI_API_KEY"):
-            flash("Image uploads need OPENAI_API_KEY for visual AI parsing. Try a text-based PDF or configure the key.", "warning")
-            return redirect(url_for("generate_quiz"))
-        if extension == "pdf" and not extracted_text:
-            flash("We could not read text from that PDF. Try a selectable-text PDF or an image with AI parsing enabled.", "error")
-            return redirect(url_for("generate_quiz"))
-        generated = _ai_quiz_from_note(extracted_text, file_path if extension != "pdf" else None)
+
+        if has_file:
+            extension = note.filename.rsplit(".", 1)[-1].lower() if "." in note.filename else ""
+            if extension not in ALLOWED_NOTE_EXTENSIONS:
+                flash("Please upload a PDF, PNG, JPG, JPEG, or WEBP note.", "error")
+                return redirect(url_for("generate_quiz"))
+            stored_name = f"{session['user_id']}_{datetime.utcnow().strftime('%Y%m%d%H%M%S%f')}_{secure_filename(note.filename)}"
+            file_path = os.path.join(app.config["UPLOAD_FOLDER"], stored_name)
+            note.save(file_path)
+            extracted_text = _extract_note_text(file_path, extension)
+            if extension != "pdf" and not os.environ.get("OPENAI_API_KEY"):
+                flash("Image uploads need OPENAI_API_KEY for visual AI parsing. Try a text-based PDF or configure the key.", "warning")
+                return redirect(url_for("generate_quiz"))
+            if extension == "pdf" and not extracted_text:
+                flash("We could not read text from that PDF. Try a selectable-text PDF or an image with AI parsing enabled.", "error")
+                return redirect(url_for("generate_quiz"))
+            image_path_for_ai = file_path if extension != "pdf" else None
+        else:
+            # No file uploaded — use the typed topic/text directly.
+            extension = "text"
+            extracted_text = topic_text
+            image_path_for_ai = None
+
+        generated = _ai_quiz_from_note(extracted_text, image_path_for_ai)
         if not generated:
             flash("Quiz generation did not return questions. Please try another note.", "error")
             return redirect(url_for("generate_quiz"))
 
         db = get_db()
+        stored_filename = secure_filename(note.filename) if has_file else "typed-topic.txt"
         db.execute("INSERT INTO uploaded_notes (user_id, filename, extracted_text, created_at) VALUES (?, ?, ?, ?)",
-                   (session["user_id"], secure_filename(note.filename), extracted_text, utc_now().isoformat()))
+                   (session["user_id"], stored_filename, extracted_text, utc_now().isoformat()))
         uploads_subject = db.execute("SELECT id FROM subjects WHERE slug = 'uploaded-notes'").fetchone()
         if not uploads_subject:
             cur = db.execute("INSERT INTO subjects (name, slug, description, icon) VALUES (?, ?, ?, ?)",
