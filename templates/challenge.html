@@ -1,0 +1,3 @@
+{% extends "base.html" %}
+{% block title %}Timed Challenge — LearnSphere AI{% endblock %}
+{% block content %}<div class="wrap"><div class="result-hero"><span class="hero-eyebrow">90-second challenge</span><h1>How fast can you learn?</h1><p>Answer a topic quiz before the timer reaches zero. Every completed challenge counts toward your progress.</p></div><div class="subject-grid">{% for t in topics %}<article class="panel subject-card"><span class="tag">{{ t['subject_name'] }}</span><h3>{{ t['name'] }}</h3><p>{{ t['description'] }}</p><a class="btn btn-amber" href="{{ url_for('quiz_start', topic_slug=t['slug'], mode='challenge') }}">Start 90s challenge</a></article>{% endfor %}</div></div>{% endblock %}

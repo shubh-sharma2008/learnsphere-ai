@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="wrap">
+  <div class="dash-head">
+    <div>
+      <h1>Your learning dashboard</h1>
+      <p>Here's where things stand, and what to tackle next.</p>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <span class="stat-label">Average score</span>
+      <span class="stat-value">{{ avg_pct }}%</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Topics started</span>
+      <span class="stat-value">{{ topics_started }} / {{ topics_total }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Quizzes taken</span>
+      <span class="stat-value">{{ quiz_count }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Learning streak</span>
+      <span class="stat-value">🔥 {{ streak }} days</span>
+    </div>
+  </div>
+
+  <div class="dash-grid">
+    <section class="panel skill-panel">
+      <span class="tag">Skill galaxy</span>
+      <h3>Your concept universe</h3>
+      <p class="muted">Each completed topic powers up a new world.</p>
+      <div class="skill-galaxy" aria-label="Topic skill progression map">
+        {% for t in performance %}
+          <a class="skill-node {{ 'unlocked' if t['attempts'] else '' }}" href="{{ url_for('quiz_start', topic_slug=t['topic_slug']) }}" title="{{ t['topic_name'] }}">
+            <span>{{ '✦' if t['attempts'] else '○' }}</span><small>{{ t['topic_name'] }}</small>
+          </a>
+        {% endfor %}
+      </div>
+    </section>
+    <section class="panel leaderboard-panel">
+      <span class="tag">This week</span><h3>Leaderboard</h3>
+      {% if leaderboard %}<ol class="leaderboard">
+        {% for learner in leaderboard %}<li><span>{{ learner['name'] }}</span><strong>{{ learner['average_score']|int }}% · {{ learner['quiz_count'] }} quizzes</strong></li>{% endfor %}
+      </ol>{% else %}<p class="muted">Complete a quiz to start this week's board.</p>{% endif %}
+    </section>
+  </div>
+
+  <section class="panel badges-panel">
+    <span class="tag">Achievements</span><h3>Your badges</h3>
+    {% if badges %}<div class="badge-list">{% for badge in badges %}<div class="badge"><b>{{ badge[2] }}</b><span>{{ badge[0] }}<small>{{ badge[1] }}</small></span></div>{% endfor %}</div>
+    {% else %}<p class="muted">Complete your first quiz to unlock your first badge.</p>{% endif %}
+  </section>
+
+  {% if recommendation %}
+  <div class="panel recommend-panel">
+    <div>
+      <span class="tag">AI recommendation</span>
+      <h3>
+        {% if recommendation['attempts'] == 0 %}
+          Start "{{ recommendation['topic_name'] }}" in {{ recommendation['subject_name'] }}
+        {% else %}
+          Revisit "{{ recommendation['topic_name'] }}" in {{ recommendation['subject_name'] }}
+        {% endif %}
+      </h3>
+      <p>
+        {% if recommendation['attempts'] == 0 %}
+          You haven't tried this topic yet — it's next in your path.
+        {% else %}
+          Your best score here is {{ recommendation['best_pct']|int }}%. A bit more practice will lock it in.
+        {% endif %}
+      </p>
+    </div>
+    <a href="{{ url_for('quiz_start', topic_slug=recommendation['topic_slug']) }}" class="btn btn-amber">
+      {{ 'Start quiz' if recommendation['attempts'] == 0 else 'Practice again' }}
+    </a>
+  </div>
+  {% endif %}
+
+  <div class="section-head" style="margin-bottom:20px;">
+    <h2 style="font-size:1.3rem;">Subjects</h2>
+  </div>
+  <div class="subject-grid">
+    {% for s in subjects %}
+      <a href="{{ url_for('subject_detail', slug=s['slug']) }}" class="panel subject-card">
+        <h3>{{ s['name'] }}</h3>
+        <p>{{ s['description'] }}</p>
+        <span class="meta">View topics &rarr;</span>
+      </a>
+    {% endfor %}
+  </div>
+
+  <div class="section-head" style="margin-bottom:20px;">
+    <h2 style="font-size:1.3rem;">Topic performance</h2>
+  </div>
+  <div class="panel" style="margin-bottom:40px; overflow-x:auto;">
+    <table class="topic-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Subject</th>
+          <th>Best score</th>
+          <th>Attempts</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in performance %}
+          <tr>
+            <td>{{ t['topic_name'] }}</td>
+            <td>{{ t['subject_name'] }}</td>
+            <td>
+              {% if t['best_pct'] is not none %}
+                {% set barclass = 'weak' if t['best_pct'] < 50 else ('mid' if t['best_pct'] < 80 else '') %}
+                <span class="pct-bar {{ barclass }}"><span style="width:{{ t['best_pct'] }}%;"></span></span>{{ t['best_pct']|int }}%
+              {% else %}
+                <span style="color:var(--text-muted);">Not attempted</span>
+              {% endif %}
+            </td>
+            <td>{{ t['attempts'] }}</td>
+            <td><a href="{{ url_for('quiz_start', topic_slug=t['topic_slug']) }}">{{ 'Retry' if t['attempts'] > 0 else 'Start' }}</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

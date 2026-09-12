@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Progress — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="wrap" style="padding-top:40px;">
+  <h1>Your progress</h1>
+  <p style="max-width:60ch; margin-bottom:30px;">Every quiz attempt, plotted over time, so you can see where you're improving.</p>
+
+  {% if history %}
+    <div class="chart-wrap">
+      <canvas id="progressChart" height="90"></canvas>
+    </div>
+  {% else %}
+    <div class="panel empty-state">
+      <p>No quiz attempts yet. Take your first quiz from the dashboard to start building your progress chart.</p>
+      <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top:14px;">Go to dashboard</a>
+    </div>
+  {% endif %}
+
+  <div class="section-head" style="margin-bottom:20px;">
+    <h2 style="font-size:1.2rem;">By topic</h2>
+  </div>
+  <div class="panel" style="overflow-x:auto;">
+    <table class="topic-table">
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Subject</th>
+          <th>Best score</th>
+          <th>Attempts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in performance %}
+          <tr>
+            <td>{{ t['topic_name'] }}</td>
+            <td>{{ t['subject_name'] }}</td>
+            <td>
+              {% if t['best_pct'] is not none %}
+                {{ t['best_pct']|int }}%
+              {% else %}
+                <span style="color:var(--text-muted);">Not attempted</span>
+              {% endif %}
+            </td>
+            <td>{{ t['attempts'] }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if history %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>
+  const ctx = document.getElementById('progressChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ chart_labels|tojson }},
+      datasets: [{
+        label: 'Quiz score (%)',
+        data: {{ chart_data|tojson }},
+        borderColor: '#5eead4',
+        backgroundColor: 'rgba(94, 234, 212, 0.12)',
+        tension: 0.3,
+        fill: true,
+        pointBackgroundColor: '#5eead4',
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#a89fd1' } } },
+      scales: {
+        x: { ticks: { color: '#a89fd1' }, grid: { color: '#33285f' } },
+        y: { min: 0, max: 100, ticks: { color: '#a89fd1' }, grid: { color: '#33285f' } }
+      }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

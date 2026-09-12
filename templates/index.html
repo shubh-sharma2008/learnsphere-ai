@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}LearnSphere AI — Smart learning for the digital age{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <span class="hero-eyebrow">Smart India Hackathon 2026 &middot; Team Code_Crafters</span>
+      <h1>Learning that adapts to you, not the other way around.</h1>
+      <p class="hero-lede">
+        LearnSphere AI studies how you answer, finds the topics that need more
+        attention, and hands you a study plan built from your own results —
+        not a generic syllabus.
+      </p>
+      <div class="hero-actions">
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Start learning free</a>
+        <a href="{{ url_for('login') }}" class="btn btn-ghost">I already have an account</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>{{ subjects|length }}</strong><span>Subjects live</span></div>
+        <div><strong>Instant</strong><span>Feedback on every quiz</span></div>
+        <div><strong>Self-paced</strong><span>Learn on your schedule</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-orb"></div>
+      <div class="hero-orb-chip chip-1">Personalized path ✓</div>
+      <div class="hero-orb-chip chip-2">Weak spot detected</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="hero-eyebrow">Proposed solution</span>
+      <h2>Five moves, one loop.</h2>
+      <p>Every session runs the same simple cycle, so progress compounds instead of scattering.</p>
+    </div>
+    <div class="grid-3">
+      <div class="panel feature">
+        <span class="num">01 · Personalize</span>
+        <h3>A path built from your scores</h3>
+        <p>The dashboard recommends what to study next based on what you've never tried and where you're weakest.</p>
+      </div>
+      <div class="panel feature">
+        <span class="num">02 · Practice</span>
+        <h3>Interactive quizzes</h3>
+        <p>Short, focused multiple-choice sets per topic with a live progress bar and instant right/wrong feedback.</p>
+      </div>
+      <div class="panel feature">
+        <span class="num">03 · Track</span>
+        <h3>Progress analytics</h3>
+        <p>A running chart of every attempt, so improvement — or a topic worth revisiting — is easy to see at a glance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="wrap">
+    <div class="panel" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+      <div>
+        <span class="hero-eyebrow">Available now</span>
+        <h3 style="margin-bottom:6px;">Jump into any subject</h3>
+        <div class="subject-strip">
+          {% for s in subjects %}
+            <span class="subject-pill">{{ s['name'] }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <a href="{{ url_for('register') }}" class="btn btn-amber">Create free account</a>
+    </div>
+  </div>
+</section>
+
+<section class="section team-section">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="hero-eyebrow">Team Code_Crafters</span>
+      <h2>Built by learners, for learners.</h2>
+      <p>LearnSphere AI is a student-led innovation created by our multidisciplinary team.</p>
+    </div>
+    <div class="team-grid">
+      <article class="panel team-card"><span class="team-number">01</span><h3>Shubh Sharma</h3></article>
+      <article class="panel team-card"><span class="team-number">02</span><h3>Prince Jainwar</h3></article>
+      <article class="panel team-card"><span class="team-number">03</span><h3>Sneha Pal</h3></article>
+      <article class="panel team-card"><span class="team-number">04</span><h3>Katikey Singh</h3></article>
+      <article class="panel team-card"><span class="team-number">05</span><h3>Keshav Kumar</h3></article>
+      <article class="panel team-card"><span class="team-number">06</span><h3>Sonu Yadav</h3></article>
+    </div>
+  </div>
+</section>
+{% endblock %}

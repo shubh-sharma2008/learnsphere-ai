@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Study Buddies — LearnSphere AI{% endblock %}
+{% block content %}
+<div class="wrap page-intro"><span class="hero-eyebrow">Study buddy matching</span><h1>Find complementary study partners</h1><p>Matches are based on quiz performance: a partner's strengths should help with your weaker topics, and yours can help with theirs.</p></div>
+<div class="wrap buddy-list">{% if matches %}{% for match in matches %}<article class="panel buddy-card"><div><span class="tag">{{ match['score'] }} complementary strength{{ 's' if match['score'] != 1 else '' }}</span><h2>{{ match['name'] }}</h2><p>Topics you can study together: {{ match['topics']|join(', ') }}</p></div><a class="btn btn-ghost" href="mailto:?subject=Study%20together%20on%20LearnSphere">Invite to study</a></article>{% endfor %}{% else %}<div class="panel empty-state"><h2>No matches yet</h2><p>Complete a few quizzes, then invite classmates to do the same. Matches appear when your strengths and weaknesses complement one another.</p></div>{% endif %}</div>
+{% endblock %}

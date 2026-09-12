@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}{{ subject['name'] }} — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="wrap" style="padding-top:40px;">
+  <a href="{{ url_for('dashboard') }}" style="font-size:0.85rem;">&larr; Back to dashboard</a>
+  <h1 style="margin-top:14px;">{{ subject['name'] }}</h1>
+  <p style="max-width:60ch;">{{ subject['description'] }}</p>
+  <div class="panel tutor-panel" style="margin:22px 0;"><span class="tag">AI tutor</span><h3>Concepts, quizzes, and help in one place</h3><p class="muted">Open any topic to attempt a quiz or a 90-second challenge; you can ask the tutor after reviewing your answers.</p></div>
+
+  <div class="topic-list">
+    {% for t in topics %}
+      {% set stat = topic_stats[t['id']] %}
+      <div class="topic-row">
+        <div>
+          <h3>{{ t['name'] }}<span class="difficulty-tag">{{ t['difficulty'] }}</span></h3>
+          <p>{{ t['description'] }}
+            {% if stat['attempts'] > 0 %}
+              &middot; Best score: {{ stat['best_pct']|int }}%
+            {% endif %}
+          </p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;"><a href="{{ url_for('quiz_start', topic_slug=t['slug']) }}" class="btn btn-primary">{{ 'Retry quiz' if stat['attempts'] > 0 else 'Start quiz' }}</a><a href="{{ url_for('quiz_start', topic_slug=t['slug'], mode='challenge') }}" class="btn btn-ghost">90s</a></div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

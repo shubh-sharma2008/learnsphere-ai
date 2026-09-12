@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Results: {{ topic['name'] }} — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="wrap result-hero">
+  <span class="hero-eyebrow">{{ subject['name'] }} &middot; {{ topic['name'] }}</span>
+  <div class="result-score">{{ score }}<span>/{{ total }}</span></div>
+  <p>
+    {% if pct >= 80 %}
+      Strong work — {{ pct }}% correct. This topic is in good shape.
+    {% elif pct >= 50 %}
+      {{ pct }}% correct. A solid start, with room to sharpen a few spots.
+    {% else %}
+      {{ pct }}% correct. Worth another pass — see the tips below.
+    {% endif %}
+  </p>
+</div>
+
+<div class="wrap">
+  {% if new_badges %}<div class="panel achievement-unlock"><span class="tag">Achievement unlocked</span>{% for badge in new_badges %}<p>{{ badge[2] }} <strong>{{ badge[0] }}</strong> — {{ badge[1] }}</p>{% endfor %}</div>{% endif %}
+  <section class="panel learning-report {{ 'report-weak' if pct < 50 else 'report-practice' if pct < 70 else 'report-strong' }}">
+    <span class="tag">Quiz result learning analysis</span>
+    <h2>{{ learning_report['status'] }}</h2>
+    <p><strong>Topic:</strong> {{ learning_report['topic_name'] }}</p>
+    <p>{{ learning_report['message'] }}</p>
+    <h3>What you should cover</h3>
+    <ol>{% for step in learning_report['steps'] %}<li>{{ step }}</li>{% endfor %}</ol>
+  </section>
+  {% if assistant %}
+  <div class="panel assistant-panel">
+    <span class="tag">AI study assistant</span>
+    <h3 style="margin-bottom:6px;">Suggestions before you try again</h3>
+    <ul>
+      {% for tip in assistant['tips'] %}
+        <li>{{ tip }}</li>
+      {% endfor %}
+    </ul>
+    {% if assistant['focus_questions'] %}
+      <p style="margin-top:14px; font-size:0.85rem;">Focus especially on:</p>
+      <ul>
+        {% for fq in assistant['focus_questions'] %}
+          <li style="color:var(--text-muted);">{{ fq }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="panel tutor-panel" data-tutor-topic="{{ topic['slug'] }}"><span class="tag">AI tutor</span><h3>Still unclear? Ask a question</h3><form class="tutor-form"><textarea name="question" maxlength="800" placeholder="For example: Why is this answer correct?"></textarea><button class="btn btn-primary" type="submit">Ask tutor</button></form><div class="tutor-answer" aria-live="polite"></div></div>
+
+  <div class="section-head" style="margin-bottom:20px;">
+    <h2 style="font-size:1.2rem;">Answer review</h2>
+  </div>
+
+  {% for r in results %}
+    {% set q = r['question'] %}
+    <div class="panel question-card">
+      <span class="q-num">Question {{ loop.index }}</span>
+      <h3>{{ q['question_text'] }}</h3>
+      <div class="options">
+        {% for letter, text in [('A', q['option_a']), ('B', q['option_b']), ('C', q['option_c']), ('D', q['option_d'])] %}
+          {% set cls = '' %}
+          {% if letter == q['correct_option'] %}
+            {% set cls = 'correct' %}
+          {% elif letter == r['selected'] and not r['is_correct'] %}
+            {% set cls = 'incorrect' %}
+          {% endif %}
+          <div class="option {{ cls }}">
+            {{ letter }}. {{ text }}
+            {% if letter == r['selected'] %} &nbsp;<em style="font-style:normal; color:var(--text-muted); font-size:0.8rem;">(your answer)</em>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+      <div class="explanation"><strong>Why:</strong> {{ q['explanation'] }}</div>
+    </div>
+  {% endfor %}
+
+  <div style="display:flex; gap:14px; padding:20px 0 60px;">
+    <a href="{{ url_for('quiz_start', topic_slug=topic['slug']) }}" class="btn btn-primary">Retry this quiz</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-ghost">Back to dashboard</a>
+  </div>
+</div>
+{% endblock %}

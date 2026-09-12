@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}AI Quiz Generator — LearnSphere AI{% endblock %}
+{% block content %}
+<div class="wrap page-intro"><span class="hero-eyebrow">AI quiz generator</span><h1>Turn notes into a practice quiz</h1><p>Upload a PDF or a clear image of your notes. LearnSphere parses the material and creates a custom quiz while keeping your original quizzes intact.</p></div>
+<div class="wrap"><form class="panel upload-form" method="POST" enctype="multipart/form-data"><label>Quiz title <input name="title" maxlength="80" placeholder="e.g. Chapter 3 revision"></label><label>Notes file <input name="note" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/*" required></label><p class="muted">PDF text is processed locally. Image notes use the configured AI vision parser. Maximum file size: 10 MB.</p><button class="btn btn-primary" type="submit">Generate my quiz</button></form></div>
+{% endblock %}

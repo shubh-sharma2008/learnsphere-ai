@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ topic['name'] }} quiz — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="wrap quiz-header">
+  <a href="{{ url_for('subject_detail', slug=subject['slug']) }}" style="font-size:0.85rem;">&larr; {{ subject['name'] }}</a>
+  <h1 style="margin-top:10px;">{{ topic['name'] }}</h1>
+  {% if timed %}<div class="challenge-timer" data-seconds="{{ time_limit }}">⚡ Challenge: <strong id="time-left">{{ time_limit }}</strong>s left</div>{% endif %}
+  <div class="quiz-progress"><span id="quiz-progress-fill"></span></div>
+</div>
+
+<div class="wrap" style="padding-bottom:20px;">
+  <div class="panel" style="margin-bottom:26px;">
+    <span class="hero-eyebrow">Study note</span>
+    <p style="color:var(--text); margin:8px 0 0;">{{ topic['study_note'] }}</p>
+  </div>
+
+  <form id="quiz-form" method="POST" action="{{ url_for('quiz_submit', topic_slug=topic['slug']) }}" data-timed="{{ 'true' if timed else 'false' }}">
+    {% for q in questions %}
+      <div class="panel question-card">
+        <span class="q-num">Question {{ loop.index }} of {{ questions|length }}</span>
+        <h3>{{ q['question_text'] }}</h3>
+        <div class="options">
+          {% for letter, text in [('A', q['option_a']), ('B', q['option_b']), ('C', q['option_c']), ('D', q['option_d'])] %}
+            <label class="option">
+              <input type="radio" name="q{{ q['id'] }}" value="{{ letter }}" required>
+              {{ text }}
+            </label>
+          {% endfor %}
+        </div>
+      </div>
+    {% endfor %}
+
+    <div class="quiz-submit-bar">
+      <button type="submit" id="quiz-submit-btn" class="btn btn-primary" disabled>Submit answers</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Create account — LearnSphere AI{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <h1>Create your account</h1>
+  <p class="auth-sub">Set up a learner profile so LearnSphere AI can start tracking progress.</p>
+
+  <form method="POST" class="panel">
+    <div class="field">
+      <label for="name">Full name</label>
+      <input type="text" id="name" name="name" required autofocus>
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" minlength="6" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Create account</button>
+  </form>
+
+  <p class="auth-switch">Already learning with us? <a href="{{ url_for('login') }}">Log in</a></p>
+</div>
+{% endblock %}
